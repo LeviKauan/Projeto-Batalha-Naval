@@ -1,50 +1,73 @@
 #include <stdio.h>
 
 #define TAM 10
-#define NAVIO 3
 
-int main() {
-    // matriz do tabuleiro 10x10
-    int tabuleiro[TAM][TAM];
-
-    // inicializa todo o tabuleiro com 0 (água)
-    for(int i=0; i<TAM; i++) {
-        for(int j=0; j<TAM; j++) {
-            tabuleiro[i][j] = 0;
-        }
-    }
-
-    // dois vetores representando os navios
-    int navioH[NAVIO] = {3, 3, 3}; // horizontal
-    int navioV[NAVIO] = {3, 3, 3}; // vertical
-
-    // coordenadas iniciais fixas
-    int linhaH = 2, colunaH = 4; // para o navio horizontal
-    int linhaV = 5, colunaV = 6; // para o navio vertical
-
-    // validar se cabem no tabuleiro
-    if (colunaH + NAVIO <= TAM && linhaV + NAVIO <= TAM) {
-        // posiciona navio horizontal
-        for(int i=0; i<NAVIO; i++) {
-            tabuleiro[linhaH][colunaH+i] = navioH[i];
-        }
-        // posiciona navio vertical
-        for(int i=0; i<NAVIO; i++) {
-            tabuleiro[linhaV+i][colunaV] = navioV[i];
-        }
-    } else {
-        printf("Coordenadas inválidas para os navios.\n");
-        return 1;
-    }
-
-    // imprime o tabuleiro
-    printf("Tabuleiro:\n");
-    for(int i=0; i<TAM; i++) {
-        for(int j=0; j<TAM; j++) {
-            printf("%d ", tabuleiro[i][j]);
+void mostrarTabuleiro(int tab[TAM][TAM]) {
+    int i, j;
+    printf("\nTabuleiro:\n");
+    for (i = 0; i < TAM; i++) {
+        for (j = 0; j < TAM; j++) {
+            // Mostrar 0 para água, 3 para navio, X para ataque já feito
+            if (tab[i][j] == 4) // ataque errado
+                printf("X ");
+            else if (tab[i][j] == 5) // ataque certo
+                printf("O ");
+            else
+                printf(". "); // não mostrar navio para o jogador
         }
         printf("\n");
     }
+}
+
+int main() {
+    int tabuleiro[TAM][TAM];
+    int i, j;
+
+    // Inicializa tabuleiro com 0 (água)
+    for (i = 0; i < TAM; i++)
+        for (j = 0; j < TAM; j++)
+            tabuleiro[i][j] = 0;
+
+    // Define navios tamanho 3
+    // Navio horizontal em (1,1)
+    for (i = 0; i < 3; i++)
+        tabuleiro[1][1+i] = 3;
+
+    // Navio vertical em (4,5)
+    for (i = 0; i < 3; i++)
+        tabuleiro[4+i][5] = 3;
+
+    int acertos = 0;
+    int totalNavio = 6; // 2 navios x 3 posições
+    int linha, coluna;
+
+    printf("Bem-vindo ao Batalha Naval - Nível Novato!\n");
+
+    while (acertos < totalNavio) {
+        mostrarTabuleiro(tabuleiro);
+
+        printf("Digite linha e coluna para atacar (0-9): ");
+        scanf("%d %d", &linha, &coluna);
+
+        if (linha < 0 || linha >= TAM || coluna < 0 || coluna >= TAM) {
+            printf("Coordenadas inválidas! Tente novamente.\n");
+            continue;
+        }
+
+        if (tabuleiro[linha][coluna] == 3) {
+            printf("Acertou um navio!\n");
+            tabuleiro[linha][coluna] = 5; // marcou acerto
+            acertos++;
+        } else if (tabuleiro[linha][coluna] == 0) {
+            printf("Água.\n");
+            tabuleiro[linha][coluna] = 4; // marcou erro
+        } else if (tabuleiro[linha][coluna] == 4 || tabuleiro[linha][coluna] == 5) {
+            printf("Posição já atacada! Tente outro lugar.\n");
+        }
+    }
+
+    printf("\nParabéns! Você afundou todos os navios!\n");
+    mostrarTabuleiro(tabuleiro);
 
     return 0;
 }
